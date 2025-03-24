@@ -20,16 +20,27 @@ const LocationInput = ({ onLocationSubmit }) => {
       startDate,
       endDate,
     });
+
+    // Clear input fields after submission
+    setLatitude("");
+    setLongitude("");
+    setRadius("");
+    setStartDate("");
+    setEndDate("");
   };
 
+  // const handleNDVICalculation = () => {
+  //   alert("NDVI Calculation initiated for the selected area!");
+  // };
+
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full  max-w-md text-white ">
+    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md text-white">
       <h2 className="text-xl font-semibold mb-4">
         Choose Your Location & Date
       </h2>
 
-      <div className="flex ">
-        <div className="m-4 ">
+      <div className="flex">
+        <div className="m-4">
           <label className="block text-sm">Latitude</label>
           <input
             type="number"
@@ -66,7 +77,7 @@ const LocationInput = ({ onLocationSubmit }) => {
         />
       </div>
 
-      <div className="flex ">
+      <div className="flex">
         <div className="m-4">
           <label className="block text-sm">Start Date</label>
           <input
@@ -94,6 +105,13 @@ const LocationInput = ({ onLocationSubmit }) => {
       >
         Locate Area
       </button>
+
+      {/* <button
+        onClick={handleNDVICalculation}
+        className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition"
+      >
+        Calculate Forest Loss
+      </button> */}
     </div>
   );
 };

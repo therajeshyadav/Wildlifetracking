@@ -40,24 +40,34 @@ const DeforestationMap = () => {
   const [endDate, setEndDate] = useState("");
   const [deforestationData, setDeforestationData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!startDate || !endDate) return;
     setLoading(true);
+    setError("");
 
     fetch(
       `https://your-api.com/deforestation?lat=${latitude}&lng=${longitude}&radius=${radius}&start=${startDate}&end=${endDate}`
     )
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) {
           setDeforestationData(data);
         } else {
-          console.error("Invalid data format");
+          setError("Invalid data format received.");
           setDeforestationData([]);
         }
       })
-      .catch((err) => console.error("Error fetching data:", err))
+      .catch((err) => {
+        setError(err.message || "Error fetching data.");
+        setDeforestationData([]);
+      })
       .finally(() => setLoading(false));
   }, [latitude, longitude, radius, startDate, endDate]);
 
@@ -81,21 +91,45 @@ const DeforestationMap = () => {
     setEndDate(endDate);
   };
 
+  const handleNDVICalculation = () => {
+    alert("NDVI Calculation initiated for the selected area!");
+    // You can add actual NDVI calculation logic here
+  };
+
   return (
-    <div className="flex flex-col items-center p-6">
-      <h2 className="text-xl font-bold text-white mb-4">
+    <div className="min-h-screen bg-gradient-to-r from-[#020024] via-[#6868cc] to-[#00d4ff] flex flex-col items-center justify-center p-6">
+      <h2 className="text-3xl font-bold text-white mb-4">
         Real-Time Deforestation Map
       </h2>
-      <div className="flex flex-row justify-between items-start space-x-6 w-full">
-        <div className="w-1/3">
+
+      <div className="flex w-full h-[90vh] space-x-6">
+        {/* Left Panel - Location Input */}
+        <div className="w-1/3 bg-gray-900 p-6 rounded-lg shadow-lg text-white flex flex-col justify-between h-full">
           <LocationInput onLocationSubmit={handleLocationSubmit} />
+          <button
+            onClick={handleNDVICalculation}
+            className="mt-4 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition"
+          >
+            Calculate Forest Loss
+          </button>
         </div>
+
+        {/* Right Panel - Map */}
         <div className="w-2/3">
-          {loading && <p className="text-gray-500">Loading data...</p>}
+          {loading && (
+            <p className="text-gray-500 text-center">Loading data...</p>
+          )}
+          {error && <p className="text-red-500 text-center">{error}</p>}
+          {!loading && !error && deforestationData.length === 0 && (
+            <p className="text-yellow-500 text-center">
+              No deforestation data found for this area.
+            </p>
+          )}
+
           <MapContainer
             center={[latitude, longitude]}
             zoom={6}
-            style={{ height: "500px", width: "100%" }}
+            style={{ height: "100%", width: "100%" }}
             className="rounded-lg shadow-md"
           >
             <TileLayer
